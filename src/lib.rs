@@ -5,6 +5,7 @@ use wasm_bindgen::prelude::*;
 
 extern crate web_sys;
 
+#[allow(unused_macros)]
 macro_rules! log {
     ( $( $t:tt)* ) => {
         web_sys::console::log_1(&format!( $( $t )* ).into());
@@ -17,6 +18,15 @@ macro_rules! log {
 pub enum Cell {
     Dead = 0,
     Alive = 1,
+}
+
+impl Cell {
+    fn toggle(&mut self) {
+        *self = match *self {
+            Cell::Alive => Cell::Dead,
+            Cell::Dead => Cell::Alive,
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -48,9 +58,7 @@ impl Universe {
 
         count
     }
-}
 
-impl Universe {
     pub fn get_cells(&self) -> &[Cell] {
         &self.cells
     }
@@ -74,7 +82,7 @@ impl Universe {
         let cells = (0..width * height)
             .map(|_i| {
                 // if i % 2 == 0 || i % 7 == 0 {
-                if js_sys::Math::random() < 0.1 {
+                if js_sys::Math::random() < 0.5 {
                     Cell::Alive
                 } else {
                     Cell::Dead
@@ -98,13 +106,13 @@ impl Universe {
                 let cell = self.cells[idx];
                 let live_neighbours = self.live_neighbour_count(row, col);
 
-                log!(
-                    "cell[{}, {}] is initally {:?} and has {} live neighbours",
-                    row,
-                    col,
-                    cell,
-                    live_neighbours,
-                );
+                // log!(
+                //     "cell[{}, {}] is initally {:?} and has {} live neighbours",
+                //     row,
+                //     col,
+                //     cell,
+                //     live_neighbours,
+                // );
 
                 let next_cell = match (cell, live_neighbours) {
                     // Rule 1: Live cell with fewer than 2 live neighbours
@@ -133,6 +141,14 @@ impl Universe {
         self.to_string()
     }
 
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
     pub fn set_width(&mut self, width: u32) {
         self.width = width;
         self.cells = (0..width * self.height).map(|_i| Cell::Dead).collect();
@@ -141,6 +157,14 @@ impl Universe {
     pub fn set_height(&mut self, height: u32) {
         self.height = height;
         self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
+    }
+
+    pub fn toggle_cell(&mut self, row: u32, col: u32) {
+        log!("Toggling row={} & col={}", row, col);
+        let idx = self.get_index(row, col);
+        log!("Before toggle: {:?}", self.cells[idx]);
+        self.cells[idx].toggle();
+        log!("After toggle: {:?}", self.cells[idx]);
     }
 }
 
