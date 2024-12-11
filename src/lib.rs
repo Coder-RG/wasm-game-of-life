@@ -27,6 +27,14 @@ impl Cell {
             Cell::Dead => Cell::Alive,
         }
     }
+
+    fn set_alive(&mut self) {
+        *self = Cell::Alive
+    }
+
+    fn set_dead(&mut self) {
+        *self = Cell::Dead
+    }
 }
 
 #[wasm_bindgen]
@@ -87,6 +95,25 @@ impl Universe {
                 } else {
                     Cell::Dead
                 }
+            })
+            .collect();
+
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+
+    pub fn empty() -> Universe {
+        utils::set_panic_hook();
+
+        let width = 32;
+        let height = 32;
+
+        let cells = (0..width * height)
+            .map(|_i| {
+                Cell::Dead
             })
             .collect();
 
@@ -160,11 +187,41 @@ impl Universe {
     }
 
     pub fn toggle_cell(&mut self, row: u32, col: u32) {
-        log!("Toggling row={} & col={}", row, col);
         let idx = self.get_index(row, col);
-        log!("Before toggle: {:?}", self.cells[idx]);
         self.cells[idx].toggle();
-        log!("After toggle: {:?}", self.cells[idx]);
+    }
+
+    pub fn insert_glider(&mut self, row: u32, col: u32) {
+        // o__
+        // _oo
+        // oo_
+
+        // row & col is the middle cell
+        let previous_row = (row + self.height - 1) % self.height;
+        let previous_col = (col + self.width - 1) % self.width;
+        let next_row = (row + 1 ) % self.height;
+        let next_col = (col + 1 ) % self.width;
+
+        let idx = self.get_index(previous_row, previous_col);
+        self.cells[idx].set_alive();
+        let idx = self.get_index(previous_row, col);
+        self.cells[idx].set_dead();
+        let idx = self.get_index(previous_row, next_col);
+        self.cells[idx].set_dead();
+
+        let idx = self.get_index(row, previous_col);
+        self.cells[idx].set_dead();
+        let idx = self.get_index(row, col);
+        self.cells[idx].set_alive();
+        let idx = self.get_index(row, next_col);
+        self.cells[idx].set_alive();
+
+        let idx = self.get_index(next_row, previous_col);
+        self.cells[idx].set_alive();
+        let idx = self.get_index(next_row, col);
+        self.cells[idx].set_alive();
+        let idx = self.get_index(next_row, next_col);
+        self.cells[idx].set_dead();
     }
 }
 
