@@ -81,11 +81,8 @@ impl Universe {
 
 #[wasm_bindgen]
 impl Universe {
-    pub fn new() -> Universe {
+    pub fn new(width: u32, height: u32) -> Universe {
         utils::set_panic_hook();
-
-        let width = 32;
-        let height = 32;
 
         let cells = (0..width * height)
             .map(|_i| {
@@ -105,11 +102,8 @@ impl Universe {
         }
     }
 
-    pub fn empty() -> Universe {
+    pub fn empty(width: u32, height: u32) -> Universe {
         utils::set_panic_hook();
-
-        let width = 32;
-        let height = 32;
 
         let cells = (0..width * height)
             .map(|_i| {
@@ -229,7 +223,7 @@ impl fmt::Display for Universe {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for line in self.cells.as_slice().chunks(self.width as usize) {
             for &cell in line {
-                let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
+                let symbol = if cell == Cell::Dead { '🌕' } else { '🌑' };
                 write!(f, "{}", symbol)?;
             }
             write!(f, "\n")?;

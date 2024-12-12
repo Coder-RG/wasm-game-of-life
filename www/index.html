@@ -17,25 +17,32 @@
             justify-content: center;
         }
 
-        <!-- body { -->
-        <!--     position: absolute; -->
-        <!--     top: 0; -->
-        <!--     left: 0; -->
-        <!--     width: 100%; -->
-        <!--     height: 100%; -->
-        <!--     display: flex; -->
-        <!--     flex-direction: column; -->
-        <!--     align-items: center; -->
-        <!--     justify-content: center; -->
-        <!--     box-sizing: border-box; -->
-        <!-- } -->
-        <!---->
-        <!-- #game-of-life-canvas { -->
-        <!--     overflow: auto; -->
-        <!--     width: 80%; -->
-        <!--     height: 80%; -->
-        <!--     text-align: center; -->
-        <!-- } -->
+        < !-- body {
+            -->< !-- position: absolute;
+            -->< !-- top: 0;
+            -->< !-- left: 0;
+            -->< !-- width: 100%;
+            -->< !-- height: 100%;
+            -->< !-- display: flex;
+            -->< !-- flex-direction: column;
+            -->< !-- align-items: center;
+            -->< !-- justify-content: center;
+            -->< !-- box-sizing: border-box;
+            -->< !--
+        }
+
+        -->< !---->< !-- #game-of-life-canvas {
+            -->< !-- overflow: auto;
+            -->< !-- width: 80%;
+            -->< !-- height: 80%;
+            -->< !-- text-align: center;
+            -->< !--
+        }-->
+
+        #fps {
+            white-space: pre;
+            font-family: monospace;
+        }
 
         button {
             margin-bottom: 10px;
@@ -46,6 +53,7 @@
 <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your
         browser.</noscript>
+    <div id="fps"></div>
     <button id="play-pause">Play/Pause</button>
     <button id="empty-canvas">Empty Canvas</button>
     <pre id="game-of-life-canvas"></pre>
