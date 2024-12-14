@@ -4,12 +4,30 @@ use core::fmt;
 use wasm_bindgen::prelude::*;
 
 extern crate web_sys;
+use web_sys::console;
 
 #[allow(unused_macros)]
 macro_rules! log {
     ( $( $t:tt)* ) => {
         web_sys::console::log_1(&format!( $( $t )* ).into());
     };
+}
+
+pub struct Timer<'a> {
+    name: &'a str,
+}
+
+impl<'a> Timer<'a> {
+    pub fn new(name: &'a str) -> Timer<'a> {
+        console::time_with_label(name);
+        Timer { name }
+    }
+}
+
+impl<'a> Drop for Timer<'a> {
+    fn drop(&mut self) {
+        console::time_end_with_label(self.name);
+    }
 }
 
 #[wasm_bindgen]
@@ -87,7 +105,7 @@ impl Universe {
         let cells = (0..width * height)
             .map(|_i| {
                 // if i % 2 == 0 || i % 7 == 0 {
-                if js_sys::Math::random() < 0.5 {
+                if js_sys::Math::random() < 0.3 {
                     Cell::Alive
                 } else {
                     Cell::Dead
@@ -105,11 +123,7 @@ impl Universe {
     pub fn empty(width: u32, height: u32) -> Universe {
         utils::set_panic_hook();
 
-        let cells = (0..width * height)
-            .map(|_i| {
-                Cell::Dead
-            })
-            .collect();
+        let cells = (0..width * height).map(|_i| Cell::Dead).collect();
 
         Universe {
             width,
@@ -119,6 +133,7 @@ impl Universe {
     }
 
     pub fn tick(&mut self) {
+        let _timer = Timer::new("Universe::tick");
         let mut next = self.cells.clone();
 
         for row in 0..self.height {
@@ -193,8 +208,8 @@ impl Universe {
         // row & col is the middle cell
         let previous_row = (row + self.height - 1) % self.height;
         let previous_col = (col + self.width - 1) % self.width;
-        let next_row = (row + 1 ) % self.height;
-        let next_col = (col + 1 ) % self.width;
+        let next_row = (row + 1) % self.height;
+        let next_col = (col + 1) % self.width;
 
         let idx = self.get_index(previous_row, previous_col);
         self.cells[idx].set_alive();
@@ -223,7 +238,7 @@ impl fmt::Display for Universe {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for line in self.cells.as_slice().chunks(self.width as usize) {
             for &cell in line {
-                let symbol = if cell == Cell::Dead { '🌕' } else { '🌑' };
+                let symbol = if cell == Cell::Dead { '☐' } else { '■' };
                 write!(f, "{}", symbol)?;
             }
             write!(f, "\n")?;

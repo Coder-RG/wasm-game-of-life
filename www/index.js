@@ -3,11 +3,12 @@ import { Universe } from "wasm-game-of-life";
 const pre = document.getElementById("game-of-life-canvas");
 const playPauseButton = document.getElementById("play-pause");
 const emptyCanvasButton = document.getElementById("empty-canvas");
+const singleTickButton = document.getElementById("single-tick");
 
 const CELL_SIZE = 5; // px
 
-const HEIGHT = 32;
-const WIDTH = 64;
+const HEIGHT = 128;
+const WIDTH = 128;
 let universe = Universe.new(WIDTH, HEIGHT);
 const width = universe.width();
 const height = universe.height();
@@ -48,6 +49,8 @@ const fps = new class {
             max = Math.max(this.frames[i], max);
         }
         let mean = sum / this.frames.length;
+        let width = WIDTH;
+        let height = HEIGHT;
 
         // Render the statistics.
         this.fps.textContent = `
@@ -56,6 +59,7 @@ Frames per Second:
 avg of last 100 = ${Math.round(mean)}
 min of last 100 = ${Math.round(min)}
 max of last 100 = ${Math.round(max)}
+      Play Area = ${width}x${height}
 `.trim();
     }
 };
@@ -68,6 +72,12 @@ const renderLoop = () => {
 
     animationId = requestAnimationFrame(renderLoop);
 };
+
+const singleTick = () => {
+    fps.render();
+    pre.textContent = universe.render();
+    universe.tick();
+}
 
 const emptyCanvas = () => {
     universe = Universe.empty(WIDTH, HEIGHT);
@@ -93,11 +103,16 @@ const isPaused = () => {
 };
 
 playPauseButton.addEventListener("click", event => {
+    console.log(isPaused(), "isPaused");
     if (isPaused()) {
         play();
     } else {
         pause();
     }
+});
+
+singleTickButton.addEventListener("click", event => {
+    requestAnimationFrame(singleTick)
 });
 
 emptyCanvasButton.addEventListener("click", event => {
